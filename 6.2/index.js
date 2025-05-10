@@ -1,10 +1,16 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+
 
 const app = express();
 const JWT_SECRET = "imthebest";
 
 const users = []
+
+app.use(express.static('public'));
+
+app.use(cors());//Helps in cors related issues.
 
 app.use(express.json()); // Middleware that let's u extract json body from the request. 
 
@@ -18,7 +24,8 @@ function auth(req, res, next) {
             if(err) {
                 res.status(401).json({message: "Unauthorized"})
             } else {
-                req.user = decoded
+                req.user = decoded // the decoded will be an object
+                // will give u just exactly what u passed when u were making this token.
                 next();
             }
         });
@@ -31,7 +38,9 @@ function auth(req, res, next) {
     
 }
 
-
+app.get('/', function(req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+})
 
 app.post('/sign-up', function(req, res){
     const username = req.body.username;
@@ -47,7 +56,7 @@ app.post('/sign-up', function(req, res){
             username: username,
             password: password
         })
-
+        console.log('A request just came');
         res.json({
             msg: "Signed up successfully"
         })
@@ -64,7 +73,7 @@ app.post('/sign-in', function(req, res){
 
     if(users.find(u => u.username === username && u.password === password)) {
         res.json({
-            mgs: "signed in successfully",
+            msg: "signed in successfully",
             token: token
         });
     }  else {
@@ -77,6 +86,18 @@ app.post('/sign-in', function(req, res){
 });
 
 app.use(auth);
+
+app.post('/log-out', function(req, res) {
+
+    const index = users.findIndex(u => u.username == req.user.username);
+    if(index)
+    users.splice(index, 1);
+
+    res.send('You have been successfully logged out');
+})
+
+
+
 
 /**
  * the /me is an authenticated endpoint, which means you will have to send token along with it. 

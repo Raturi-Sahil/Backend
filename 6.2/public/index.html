@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication website</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+
+<script>
+    let tok = "";
+    async function signup() {
+        const username = document.getElementById("signup-username").value;
+        const password = document.getElementById('signup-password').value;
+
+        if(!username || !password)  {
+            alert("Please fill both username and password.");
+            return;
+            // see why do i have to write this and why didn't the required functionaly of the form work.
+        }
+
+        await axios.post('http://localhost:3000/sign-up', {
+            username: username,
+            password: password
+        });
+        alert('you are signed up');
+        document.getElementById("signup-username").value = "";
+        document.getElementById("signup-password").value = "";
+    }
+    async function signin() {
+        const username = document.getElementById("signin-username").value;
+        const password = document.getElementById('signin-password').value;
+
+        if(!username || !password)  {
+            alert("Please fill both username and password.");
+            return;
+            // see why do i have to write this and why didn't the required functionaly of the form work.
+        }
+
+        const response = await axios.post('http://localhost:3000/sign-in', {
+            username: username,
+            password: password
+        });
+        
+        const val = await axios.get('http://localhost:3000/me',{
+            headers: {
+                token : response.data.token
+            }
+        });
+
+        tok = response.data.token;
+
+        document.getElementById("userinfo").textContent = val.data.username;
+
+        alert('you are signed in');
+        document.getElementById("signin-username").value = "";
+        document.getElementById("signin-password").value = "";
+    }
+
+    async function logout() {
+        
+        const response = axios.post('http://www.localhost:3000/log-out', {
+        }, {
+            headers: {token: tok}
+        });
+
+        document.getElementById("userinfo").textContent = "";
+    }
+
+</script>
+<body>
+    <p>User Authentication</p>
+    <div id="main">
+        <div>
+
+            <label for="signup-username">sign-up</label>
+            <input id="signup-username" type="text" placeholder="Username" required/>
+            
+            <input id="signup-password" type="password" placeholder="Password" required/>
+            <button onclick="signup()">Submit</button>
+            
+        </div>
+        <br>
+        <div>
+
+            <label for="signin-username">sign-in</label>
+            <input id="signin-username" type="text" placeholder="Username" required/>
+            
+            <input id="signin-password" type="password" placeholder="Password" required/>
+            <button onclick="signin()">Submit</button>
+
+        </div>
+        <br>
+        <div>
+            <p>User Information: <span id="userinfo"></span></p>
+        </div>
+        <br>
+        <button onclick="logout()">Logout</button>
+    </div>
+</body>
+</html>
