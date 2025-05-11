@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+}
+#signup {
+    display: block;
+    border: 1px solid black;
+    
+
+}
+
+#signin {
+    display: none;
+    border: 1px solid black;
+    
+}
+
+#userDetails {
+    display: none;
+    border: 1px solid black;
+    
+}

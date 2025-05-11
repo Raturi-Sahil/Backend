@@ -9,6 +9,7 @@ const JWT_SECRET = "imthebest";
 const users = []
 
 app.use(express.static('public'));
+app.use('/css', express.static('css'))
 
 app.use(cors());//Helps in cors related issues.
 
@@ -92,6 +93,7 @@ app.post('/log-out', function(req, res) {
     const index = users.findIndex(u => u.username == req.user.username);
     if(index)
     users.splice(index, 1);
+    
 
     res.send('You have been successfully logged out');
 })
