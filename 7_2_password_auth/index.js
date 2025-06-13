@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');// import the bcrypt library.
 const { UserModel, TodoModel } = require('./db');
 const { auth, JWT_SECRET} = require('./auth');
 const jwt = require('jsonwebtoken'); // This is what we call as importing the jsonwebtoken library, but before this we gotta intall (or bring the library to our codebase ) the library using npm install jsonwebtoken
-
+const {z} = require('zod');
 
 //Giving my backend our database credentials
 const mongoose = require('mongoose');
@@ -21,9 +21,20 @@ app.use(express.json());
 app.post("/signup", async function(req, res) {
     try{
 
-        if (typeof email !== "string" || email.length < 5 || !email.includes("@")) {
-            res.json({
-            message: "Email incorrect"
+        // Defining the schema of the input data. 
+        const requiredBody = z.object({
+            email: z.string().min(3).max(100).email(), 
+            password: z.string().min(3).max(100).password(),
+            name: z.string().min(3).max(100).name()
+        });
+
+        // doing the check
+        //method1: const parsedData = requiredBody.parse(req.body);
+        const parsedDataWithSuccess = requiredBody.safeParse(req.body);// method 2, we'll use this for now
+
+        if(!parsedDataWithSuccess.success) {
+            res.status(400).json({
+                msg: "Invalid input format."
             });
             return;
         }
