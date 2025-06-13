@@ -20,7 +20,15 @@ app.use(express.json());
 // endpoint for signup
 app.post("/signup", async function(req, res) {
     try{
-        // Object Destructuring..
+
+        if (typeof email !== "string" || email.length < 5 || !email.includes("@")) {
+            res.json({
+            message: "Email incorrect"
+            });
+            return;
+        }
+
+
         const {email, password, name} = req.body;
         
         // if any of the fields is missing then we don't proceed..
