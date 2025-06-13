@@ -24,8 +24,17 @@ app.post("/signup", async function(req, res) {
         // Defining the schema of the input data. 
         const requiredBody = z.object({
             email: z.string().min(3).max(100).email(), 
-            password: z.string().min(3).max(100).password(),
-            name: z.string().min(3).max(100).name()
+            password: z.string().min(3).max(100)
+            .refine((val)=> /[A-Z]/.test(val), {
+                message: "Must contain atleast one uppercase character"
+            })
+            .refine((val)=> /[0-9]/.test(val), {
+                message: "Must contain atleast one digit"
+            })
+            .refine((val)=> /[^A-Za-z0-9]/.test(val), {
+                message: "Must contain atleast one special character"
+            }),
+            name: z.string().min(3).max(100)
         });
 
         // doing the check
@@ -34,7 +43,8 @@ app.post("/signup", async function(req, res) {
 
         if(!parsedDataWithSuccess.success) {
             res.status(400).json({
-                msg: "Invalid input format."
+                msg: "Invalid input format.",
+                error: parsedDataWithSuccess.error
             });
             return;
         }
