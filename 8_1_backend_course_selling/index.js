@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const { UserModel } = require('./models/user');
 const { CourseModel } = require('./models/course');
 const { PurchaseModel } = require('./models/purchase');
+const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../7_2_password_auth/auth');
 
 // const z = require('zod');
@@ -98,8 +99,8 @@ app.get('/courses', authorize('user'), async function(req, res) {
         // this endpoint shows all courses available for a user to purchase.
         const courses = await CourseModel.find();// fetch all the course.
 
-        if(!courses)
-            return res.json({msg: "No course created"}); 
+        if(!courses || courses.length == 0)
+            return res.json({msg: "No course availabel"}); 
 
         res.status(200).json(courses);// send to the frontend.
     }catch(error) {
@@ -117,13 +118,13 @@ app.post('/user/purchases', authorize('user'), async function(req, res) {
         if(!courseId)
             return res.status(400).json({msg: "Invalid input"});
 
-        const existingPurchase = await PurchaseModel.findOne({userId, courseId});
+        const existingPurchase = await PurchaseModel.find({userId, courseId});
         if(existingPurchase)
             return res.status(409).json({msg: "Course already purchased"});
 
         const purchase = await PurchaseModel.create({userId, courseId});
 
-        if(!purchase)
+        if(!purchase || purchase.length == 0)
             return res.status(500).json({msg: "An error occured during purchase"});
 
         res.status(201).json({msg: "Transaction successful", purchase});
@@ -134,7 +135,7 @@ app.post('/user/purchases', authorize('user'), async function(req, res) {
 });
 app.get('/user/purchases', authorize('user'),async function(req, res) {
     try {
-        //this endpoint let's a user make a purchase. 
+        //this endpoint fetches all the purchased courses of a user. 
         const userId = req.userId;
         const purchases = await PurchaseModel.findOne({userId});
         res.status(200).json(purchases);
@@ -153,9 +154,10 @@ app.delete('/admin/courses/:id', authorize('admin'), async function(req, res) {
         const response = await CourseModel.findByIdAndDelete(courseId);
         
         if(!response)
-            res.status(500).json({msg: "Internal server error"});
+            res.status(404).json({msg: "Course not found"});
 
-        res.status(204).json({msg: "Course successfully deleted", response});
+        // res.status(204).json({msg: "Course successfully deleted", response}); if you keep it 204 then don't send a body, else make it 200 and send a body with it. 
+        res.status(200).json({msg: "Course successfully deleted"});
     }catch(error) {
         console.error(error);
         return res.status(500).json({msg: "Internal server error"});
@@ -177,7 +179,7 @@ app.post('/admin/courses', authorize('admin'), async function(req, res) {
         if(!course)
             return res.status(500).json({msg: "Internal server error"});
 
-        res.status(201).json({msg: "Course successfully created"}, course);
+        res.status(201).json({msg: "Course successfully created", course});
     } catch(error) {
         console.error(error);
         res.status(500).json({msg: "Internal server error"});
@@ -191,7 +193,7 @@ app.put('/admin/courses/:id', authorize('admin'), async function(req, res) {
 
         // no need to check for course id, if it hadn't been there then the requiest wouldn't have hit this endpoint.
 
-        if(!updates)
+        if(!updates || Object.keys(updates).length == 0)
             return res.status(400).json({msg: "Nothing to update"});
 
         const updatedCourse = await CourseModel.findByIdAndUpdate(courseId, {$set: updates}, {new: true, runValidators: true});
@@ -212,7 +214,7 @@ app.get('/admin/courses', authorize('admin'), async function(req, res) {
         // this endpoint let's an admin to fetch all the courses they have created. 
         const userId = req.userId;
         const courses = await CourseModel.find({userId});// fetch all the course. 
-        if(!courses)
+        if(!courses || courses.length == 0)
             return res.json({msg: "No course created", userId});
 
         res.status(200).json(courses);// send to the frontend.
