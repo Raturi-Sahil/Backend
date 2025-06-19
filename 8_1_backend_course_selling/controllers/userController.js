@@ -8,7 +8,7 @@ const { PurchaseModel } = require('../models/purchase');
             const courses = await CourseModel.find();// fetch all the course.
 
             if(!courses || courses.length == 0)
-                return res.json({msg: "No course availabel"}); 
+                return res.json({msg: "No course availabe"}); 
 
             res.status(200).json(courses);// send to the frontend.
         }catch(error) {
