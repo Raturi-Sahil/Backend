@@ -1,6 +1,6 @@
 const { UserModel } = require('../models/user');
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.SECRET;
 const bcrypt = require('bcrypt');
 
 
@@ -56,12 +56,15 @@ async function signin(req, res) {
         //if password auth fails then just return
         if(!passwordMatch) return res.status(401).json({msg: "Invalid credentials"});
 
+        
+        console.log("user role", user.role);
+
         //if the user exists we go on to create a token through jsonwebtoken library.
-        const authorization = jwt.sign({id: user._id}, JWT_SECRET);
+        const authorization = jwt.sign({id: user._id, role: user.role}, JWT_SECRET);
 
         //if tokne creation fails then return
-        if(!authorization)
-            return res.status(500).json({msg: "An error occured during sign in, please try again later"});
+        // if(!authorization)  // No need to write this as jwt never returns null /undefined or succes rather it throws an error, which catch block will take care of.
+        //     return res.status(500).json({msg: "An error occured during sign in, please try again later"});
         
         res.status(201).json({msg: "You are successfully signed in", authorization});
 

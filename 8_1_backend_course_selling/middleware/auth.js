@@ -13,6 +13,7 @@ function authorize(requiredRole = null) {
                             if(err) {
                                 return res.status(401).json({msg: "Invalid or Expired token"});
                             }
+                            console.log(decoded.role);
                             if(requiredRole && decoded.role != requiredRole) {
                                 return res.status(403).json({msg: `Forbidden: ${requiredRole}s only`});
                             }

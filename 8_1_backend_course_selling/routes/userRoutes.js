@@ -3,11 +3,12 @@
 
 const Router = require('express'); // here we are directly destructuring the Router key. 
 const userRouter = Router();
+const { authorize } = require('../middleware/auth');
 const { courses, purchase, purchases } = require('../controllers/userController');
 
-    userRouter.get('/courses', courses);
-    userRouter.post('/purchase', purchase);
-    userRouter.get('/purchases', purchases);
+    userRouter.get('/courses', authorize('user'), courses);
+    userRouter.post('/purchase', authorize('user'), purchase);
+    userRouter.get('/purchases', authorize('user'), purchases);
 
 
 
