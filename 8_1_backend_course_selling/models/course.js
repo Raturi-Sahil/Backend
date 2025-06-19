@@ -7,13 +7,13 @@ const ObjectId = Schema.ObjectId;
 const CourseSchema = new Schema({
     title: {type: String, required: true, unique: true},
     discription: String,
-    price: {type:number, required: true},
+    price: {type:Number, required: true},
     createdby: {type: ObjectId, required: true},
     createdat: {type: Date, default: Date.now}
 });
 
 
-const CourseModel = mongoose.Model('Course', CourseSchema);
+const CourseModel = mongoose.model('Course', CourseSchema);
 
 module.exports = {
     CourseModel

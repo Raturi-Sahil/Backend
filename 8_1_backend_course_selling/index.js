@@ -3,8 +3,6 @@ require('dotenv').config();// Importing the dotenv library.
 const PORT = process.env.PORT || 5000;
 const DB_URL = process.env.DB_URL;
 
-const { authorize } = require('./middleware/auth');
-
 const mongoose = require('mongoose');
 
 const userRouter = require('./routes/userRoutes');
