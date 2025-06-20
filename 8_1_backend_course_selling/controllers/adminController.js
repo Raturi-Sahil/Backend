@@ -18,8 +18,7 @@ async function erase(req, res) {
         console.error(error);
         return res.status(500).json({msg: "Internal server error"});
     }
-
-    }
+}
 
     async function create(req, res) {
             try {

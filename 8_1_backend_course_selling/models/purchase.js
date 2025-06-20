@@ -10,6 +10,7 @@ const PurchaseSchema = new Schema({
     validTill: {type: Date, default: function() {
         const oneYearFromNow = new Date();
         oneYearFromNow.setFullYear(oneYearFromNow.getFullYear()+1);
+        return oneYearFromNow;
     }}
 });
 
