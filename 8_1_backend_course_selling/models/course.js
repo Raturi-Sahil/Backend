@@ -12,6 +12,7 @@ const CourseSchema = new Schema({
     createdat: {type: Date, default: Date.now}
 });
 
+CourseSchema.index({title: 1, createdby: 1}, {unique: true});
 
 const CourseModel = mongoose.model('Course', CourseSchema);
 

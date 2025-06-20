@@ -3,13 +3,14 @@ const adminRouter = Router();
 const { authorize } = require('../middleware/auth');
 const { erase, create, update, fetch } = require('../controllers/adminController');
 
+adminRouter.use(authorize('admin'));
 
-    adminRouter.delete('/courses/:id', authorize('admin'), erase);
+adminRouter.delete('/courses/:id', erase);
 
-    adminRouter.post('/courses', authorize('admin'), create);
+adminRouter.post('/courses', create);
 
-    adminRouter.put('/courses/:id', authorize('admin'),update);
+adminRouter.put('/courses/:id',update);
 
-    adminRouter.get('/courses', authorize('admin'),fetch);
+adminRouter.get('/courses',fetch);
 
 module.exports = adminRouter;

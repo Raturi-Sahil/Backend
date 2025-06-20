@@ -6,10 +6,10 @@ const userRouter = Router();
 const { authorize } = require('../middleware/auth');
 const { courses, purchase, purchases } = require('../controllers/userController');
 
-    userRouter.get('/courses', authorize('user'), courses);
-    userRouter.post('/purchase', authorize('user'), purchase);
-    userRouter.get('/purchases', authorize('user'), purchases);
+userRouter.use(authorize('user'));
 
-
+userRouter.get('/courses', courses);
+userRouter.post('/purchase', purchase);
+userRouter.get('/purchases', purchases);
 
 module.exports = userRouter

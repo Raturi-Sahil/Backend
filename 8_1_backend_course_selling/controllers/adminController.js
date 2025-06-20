@@ -10,7 +10,7 @@ async function erase(req, res) {
         const response = await CourseModel.findByIdAndDelete(courseId);
         
         if(!response)
-            res.status(404).json({msg: "Course not found"});
+            return res.status(404).json({msg: "Course not found"});
 
         // res.status(204).json({msg: "Course successfully deleted", response}); if you keep it 204 then don't send a body, else make it 200 and send a body with it. 
         res.status(200).json({msg: "Course successfully deleted"});
@@ -29,12 +29,19 @@ async function erase(req, res) {
     
                 if(!title || !description || !price)
                     return res.status(400).json({msg: "Please fill all the details"});
-    
-                const course = await CourseModel.create({title, description, price, userId});
+                console.log(userId);
+
+                const alreadyExists = await CourseModel.findOne({title, description, price, createdby: userId});
+
+                // Prevent duplicate course. 
+                if(alreadyExists)
+                    return res.status(400).json({msg: "Duplicate courses are not allowed"});
+
+                const course = await CourseModel.create({title, description, price, createdby: userId});
     
                 // if course creation fails
                 if(!course)
-                    return res.status(500).json({msg: "Internal server error"});
+                    return res.status(500).json({msg: "Course creation failed"});
     
                 res.status(201).json({msg: "Course successfully created", course});
             } catch(error) {
@@ -72,7 +79,7 @@ async function erase(req, res) {
         try {
             // this endpoint let's an admin to fetch all the courses they have created. 
             const userId = req.userId;
-            const courses = await CourseModel.find({userId});// fetch all the course. 
+            const courses = await CourseModel.find({createdby: userId});// fetch all the course. 
             if(!courses || courses.length == 0)
                 return res.json({msg: "No course created", userId});
 
