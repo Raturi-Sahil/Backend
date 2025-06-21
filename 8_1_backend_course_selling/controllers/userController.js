@@ -21,7 +21,7 @@ const { PurchaseModel } = require('../models/purchase');
         try {
             //this endpoint let's a user make a purchase. 
             const userId = req.userId;
-            const courseId = req.body.courseId;
+            const courseId = req.params.id;
 
             if(!courseId)
                 return res.status(400).json({msg: "Invalid input"});
